@@ -49,7 +49,7 @@ def handleMention(content):
     postToChat(channel, message)
 
 def getSlackApiHeaders():
-    return {'Content-Type' : 'application/json; charset=utf-8', 'Authorization' : 'Bearer ' + app.cofing['BOT_OAUTH'] }
+    return {'Content-Type' : 'application/json; charset=utf-8', 'Authorization' : 'Bearer ' + app.config['BOT_OAUTH'] }
 
 def postToChat(channel, message):
     chatUrl = app.config['BASE_SLACK_API'] + 'chat.postMessage'
