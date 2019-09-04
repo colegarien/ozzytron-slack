@@ -1,8 +1,11 @@
 from flask import Flask, jsonify, make_response, request, abort
 import requests
+from db_util import DB
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('ozzytron.cfg', silent=True)
+
+db = DB()
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -11,6 +14,10 @@ def index():
         return jsonify({'challenge' : content['challenge']})
     elif content != None and content['event']['type'] == 'app_mention':
        handleMention(content) 
+    elif content != None and content['event']['type'] == 'message' and content['event']['channel_type'] == 'im':
+        handlePrivateMessage(content)
+    elif content != None:
+        print(content['event']['type'])
 
     return jsonify({'success':True})
 
@@ -19,11 +26,28 @@ def index():
 def not_found(error):
     return make_response(jsonify({'error':'Not found'}), 404)
 
+def handlePrivateMessage(content):
+    user = content['event']['user']
+    channel = content['event']['channel']
+    text = content['event']['text']
+    if text.find('make me a man') > -1:
+        current = db.selectOne("SELECT id FROM player WHERE username = ?", [user])
+        if current == None or len(current) == 0:
+            print ('none')
+            db.insert("INSERT INTO player(username, ozzy_tokens) VALUES(?, ?)", [user, 20])
+
+
 def handleMention(content):
     user = content['event']['user']
     channel = content['event']['channel']
     text = content['event']['text']
-    if text.find('call') > -1:
+    if text.find('am I a man?') > -1:
+        current = db.selectOne("""SELECT id, ozzy_tokens FROM player WHERE username = ?""", [user])
+        if current == None:
+            message = 'No <@'+user+'>. No you are not.'
+        else:
+            message = 'Yes <@'+user+'>! You are man ' + str(current['id']) + '. Your wallet currently has '+str(current['ozzy_tokens'])+' OTs' 
+    elif text.find('call') > -1:
         message = '<@' + user + '>, Call who a what now?'
         callIndex = text.find('call')
         userStart = text.find('<@', callIndex)
