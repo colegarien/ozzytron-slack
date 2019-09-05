@@ -21,10 +21,9 @@ class Repo:
 
         currentPlayer = self.getPlayerForUser(player.username)
         if currentPlayer == None:
-            currentPlayer.id = self.db.insert("INSERT INTO player(username, ozzy_tokens) VALUES(?, ?)", [player.username, player.ozzyTokens])
-            return currentPlayer
-        
-        self.db.insert("UPDATE player SET ozzy_tokens=? WHERE id=?", [player.ozzyTokens, player.id])
+            player.id = self.db.insert("INSERT INTO player(username, ozzy_tokens) VALUES(?, ?)", [player.username, player.ozzyTokens])
+        else:
+            self.db.insert("UPDATE player SET ozzy_tokens=? WHERE id=?", [player.ozzyTokens, player.id])
         return player
 
 class Player:
