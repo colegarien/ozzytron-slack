@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, make_response, request, abort
 import requests
-from db_util import DB
+from repo import Repo, Player
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('ozzytron.cfg', silent=True)
 
-db = DB()
+repo = Repo()
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -31,10 +31,9 @@ def handlePrivateMessage(content):
     channel = content['event']['channel']
     text = content['event']['text']
     if text.find('make me a man') > -1:
-        current = db.selectOne("SELECT id FROM player WHERE username = ?", [user])
-        if current == None or len(current) == 0:
-            print ('none')
-            db.insert("INSERT INTO player(username, ozzy_tokens) VALUES(?, ?)", [user, 20])
+        player = Player()
+        player.username = user
+        repo.savePlayer(player)
 
 
 def handleMention(content):
@@ -42,11 +41,11 @@ def handleMention(content):
     channel = content['event']['channel']
     text = content['event']['text']
     if text.find('am I a man?') > -1:
-        current = db.selectOne("""SELECT id, ozzy_tokens FROM player WHERE username = ?""", [user])
+        current = repo.getPlayerForUser(user)
         if current == None:
             message = 'No <@'+user+'>. No you are not.'
         else:
-            message = 'Yes <@'+user+'>! You are man ' + str(current['id']) + '. Your wallet currently has '+str(current['ozzy_tokens'])+' OTs' 
+            message = 'Yes <@'+user+'>! You are man ' + str(current.id) + '. Your wallet currently has '+str(current.ozzyTokens)+' OTs' 
     elif text.find('call') > -1:
         message = '<@' + user + '>, Call who a what now?'
         callIndex = text.find('call')
@@ -60,14 +59,6 @@ def handleMention(content):
                 message = 'Sorry <@'+user+'>, that\'s fucked up.' 
             elif len(what) > 0 and len(target) > 0:
                 message = target + ', you a ' + what + '.'
-    elif text.find('add') > -1:
-        message = '<@' + user + '>, Add what?'
-        what = text[text.find('add')+3:].strip()
-        if len(what) > 0:
-            pass # TODO save to sqlite db
-    elif text.find('show') > -1:
-        message = '<@' + user + '>' + ', show you what?'
-        # TODO pull the added stuff
     else:
         message = 'Sorry <@' + user + '>, I\'mma damn retard!'
     postToChat(channel, message)
