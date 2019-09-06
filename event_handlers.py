@@ -26,7 +26,7 @@ class Event:
 
 class EventQueue:
     def __init__(self, repo: Repo, api : SlackApi):
-        self.handlers = ['MakeMeMan', 'AmIMan', 'CallSomebody']
+        self.handlers = [MakeMeMan, AmIMan, CallSomebody]
         self.repo = repo
         self.api = api
 
@@ -35,8 +35,7 @@ class EventQueue:
         self.processEvent(event)
 
     def processEvent(self, event : Event):
-        for handlerClass in self.handlers:
-            handler = globals()[handlerClass]
+        for handler in self.handlers:
             if getattr(handler, 'isMatch')(event):
                 getattr(handler, 'handle')(event, self.repo, self.api)
                 return True
