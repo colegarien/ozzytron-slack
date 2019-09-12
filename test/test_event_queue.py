@@ -46,5 +46,39 @@ class TestEventQueue(unittest.TestCase):
         # Assert
         self.assertTrue(actual)
 
+    def test_processEvent_MakeMeManHandler_savePlayer(self):
+        # Arrange
+        queue = EventQueue(self.repo, self.api)
+        event = Event.fromRequest({'event' : {'text' : 'make me a man', 'type': 'message', 'channel_type' : 'im'}})
+
+        # Act
+        actual = queue.processEvent(event)
+
+        # Assert
+        self.assertTrue(actual)
+
+    def test_processEvent_AmIMan_postMessage(self):
+        # Arrange
+        queue = EventQueue(self.repo, self.api)
+        event = Event.fromRequest({'event' : {'text' : 'am I a man?', 'type': 'app_mention'}})
+
+        # Act
+        actual = queue.processEvent(event)
+
+        # Assert
+        self.assertTrue(actual)
+
+    def test_processEvent_CallSomebody_postMessage(self):
+        # Arrange
+        queue = EventQueue(self.repo, self.api)
+        event = Event.fromRequest({'event' : {'text' : 'call <@something> a bitch', 'type': 'app_mention'}})
+
+        # Act
+        actual = queue.processEvent(event)
+
+        # Assert
+        self.assertTrue(actual)
+
+
 if __name__ == '__main__':
     unittest.main()
