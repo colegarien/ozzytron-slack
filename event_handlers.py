@@ -39,8 +39,9 @@ class EventQueue:
             if getattr(handler, 'isMatch')(event):
                 getattr(handler, 'handle')(event, self.repo, self.api)
                 return True
-        message = 'Sorry <@' + event.sourceUser + '>, I\'mma damn retard!'
-        self.api.postToChat(event.sourceChannel, message)
+        if not event.isPrivateMessageType():
+            message = 'Sorry <@' + event.sourceUser + '>, I\'mma damn retard!'
+            self.api.postToChat(event.sourceChannel, message)
         return False
 
 
@@ -67,7 +68,7 @@ class AmIMan(EventHandler):
         if current == None:
             message = 'No <@'+event.sourceUser+'>. No you are not.'
         else:
-            message = 'Yes <@'+event.sourceUser+'>! You are man ' + str(current.id) + '. Your wallet currently has '+str(current.ozzyTokens)+' OTs' 
+            message = 'Yes <@'+event.sourceUser+'>!\nYou are a level '+str(current.attributes.level)+' man.\nWallet: '+str(current.ozzyTokens)+' OTs\nExperience: ('+str(current.attributes.curExp)+'/'+str(current.attributes.maxExp)+')\nHealth: ('+str(current.attributes.curHp)+'/'+str(current.attributes.maxHp)+')' 
         api.postToChat(event.sourceChannel, message)
 
 class CallSomebody(EventHandler):

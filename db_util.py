@@ -38,7 +38,13 @@ if __name__ == "__main__":
 CREATE TABLE player (
     id integer PRIMARY KEY,
     username text NOT NULL,
-    ozzy_tokens integer NOT NULL
+    ozzy_tokens integer NOT NULL,
+
+    level integer NOT NULL,
+    exp integer NOT NULL,
+    max_exp integer NOT NULL,
+    hp integer NOT NULL,
+    max_hp integer NOT NULL
 )
     """)
 
