@@ -1,3 +1,4 @@
+from flask import render_template
 from repo import Repo, Player
 from slack_api import SlackApi
 
@@ -39,7 +40,7 @@ class EventQueue:
             if getattr(handler, 'isMatch')(event):
                 getattr(handler, 'handle')(event, self.repo, self.api)
                 return True
-        if not event.isPrivateMessageType():
+        if not event.isPrivateMessageType() and event.isMentionType():
             message = 'Sorry <@' + event.sourceUser + '>, I\'mma damn retard!'
             self.api.postToChat(event.sourceChannel, message)
         return False
@@ -54,7 +55,7 @@ class EventHandler:
 
 class MakeMeMan(EventHandler):
     def isMatch(event : Event):
-        return event.isPrivateMessageType() and event.text.find('make me a man') > -1
+        return event.isPrivateMessageType() and event.text.lower().find('make me a man') > -1
     def handle(event : Event, repo: Repo, api : SlackApi):
         player = Player()
         player.username = event.sourceUser
@@ -62,24 +63,21 @@ class MakeMeMan(EventHandler):
 
 class AmIMan(EventHandler):
     def isMatch(event : Event):
-        return event.isMentionType() and event.text.find('am I a man?') > -1
+        return event.isMentionType() and event.text.lower().find('am i a man?') > -1
     def handle(event : Event, repo: Repo, api : SlackApi):
         current = repo.getPlayerForUser(event.sourceUser)
-        if current == None:
-            message = 'No <@'+event.sourceUser+'>. No you are not.'
-        else:
-            message = 'Yes <@'+event.sourceUser+'>!\nYou are a level '+str(current.attributes.level)+' man.\nWallet: '+str(current.ozzyTokens)+' OTs\nExperience: ('+str(current.attributes.curExp)+'/'+str(current.attributes.maxExp)+')\nHealth: ('+str(current.attributes.curHp)+'/'+str(current.attributes.maxHp)+')' 
+        message = render_template('player.html', event=event, player=current)
         api.postToChat(event.sourceChannel, message)
 
 class CallSomebody(EventHandler):
     def isMatch(event : Event):
-        return event.isMentionType() and event.text.find('call') > -1
+        return event.isMentionType() and event.text.lower().find('call') > -1
     def handle(event : Event, repo: Repo, api : SlackApi):
         message = '<@' + event.sourceUser + '>, Call who a what now?'
-        callIndex = event.text.find('call')
-        userStart = event.text.find('<@', callIndex)
-        userEnd = event.text.find('>', callIndex)
-        aIndex = event.text.find(' a ', userEnd)
+        callIndex = event.text.lower().find('call')
+        userStart = event.text.lower().find('<@', callIndex)
+        userEnd = event.text.lower().find('>', callIndex)
+        aIndex = event.text.lower().find(' a ', userEnd)
         if userStart > -1 and userEnd > -1 and aIndex > -1:
             target = event.text[userStart:userEnd+1].strip()
             what = event.text[aIndex+2:].strip()

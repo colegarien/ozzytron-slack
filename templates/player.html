@@ -1,0 +1,10 @@
+{% import 'macros.html' as macros %}
+{% if player %}
+Yes {{macros.toUser(event.sourceUser)}}!
+You are a level {{player.attributes.level}} man.
+Wallet: {{player.ozzyTokens}} OTs
+Experience: ({{player.attributes.curExp}}/{{player.attributes.maxExp}})
+Health: ({{player.attributes.curHp}}/{{player.attributes.maxHp}} 
+{% else %}
+No {{macros.toUser(event.sourceUser)}}. No you are not.
+{% endif %}
