@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, make_response, request, abort
 from repo import Repo
 from slack_api import SlackApi
-from event_handlers import EventQueue, Event
+from event_queue import EventQueue
+from event import Event
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('ozzytron.cfg', silent=True)

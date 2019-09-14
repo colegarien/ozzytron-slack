@@ -1,4 +1,7 @@
-from event_handlers import EventQueue, Event, EventHandler
+from app import app
+from event_queue import EventQueue
+from event_handlers import EventHandler
+from event import Event
 import unittest
 from unittest import mock
 
@@ -63,7 +66,8 @@ class TestEventQueue(unittest.TestCase):
         event = Event.fromRequest({'event' : {'text' : 'am I a man?', 'type': 'app_mention'}})
 
         # Act
-        actual = queue.processEvent(event)
+        with app.app_context():
+            actual = queue.processEvent(event)
 
         # Assert
         self.assertTrue(actual)
