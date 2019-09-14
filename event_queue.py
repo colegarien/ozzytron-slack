@@ -2,8 +2,10 @@ from repo import Repo
 from slack_api import SlackApi
 from event import Event
 
+import threading
 import event_handlers as handlers
 import inspect
+import time
 
 class EventQueue:
     def __init__(self, repo: Repo, api : SlackApi):
@@ -13,10 +15,23 @@ class EventQueue:
                 self.handlers.append(theClass)
         self.repo = repo
         self.api = api
+        
+        # thread for processing events
+        self.thread = threading.Thread(target=self.run, daemon=True)
+        self.eventQueue = []
+
+    def run(self):
+        while True:
+            if len(self.eventQueue) > 0:
+                # process events
+                self.processEvent(self.eventQueue.pop())
+            time.sleep(2)
 
     def queue(self, event : Event):
-        # process immediately
-        self.processEvent(event)
+        if not self.thread.isAlive():
+            self.thread.start()
+        # queue it for later
+        self.eventQueue.append(event)
 
     def processEvent(self, event : Event):
         for handler in self.handlers:
