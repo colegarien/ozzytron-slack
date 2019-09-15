@@ -7,9 +7,6 @@ class Presenter:
 
     def player(player):
         if player == None:
-            return ''
+            return '...'
 
-        return """You are a level """ + player.attributes.level + """ man.
-Wallet: """+player.ozzyTokens+""" OTs
-Experience: ("""+player.attributes.curExp+"""/"""+player.attributes.maxExp+""")
-Health: ("""+player.attributes.curHp+"""/"""+player.attributes.max+""")""";
+        return 'You are a level {} man.\nWallet: {} OTs\nExperience: ({}/{})\nHealth: ({}/{})'.format(player.attributes.level,player.ozzyTokens,player.attributes.curExp,player.attributes.maxExp,player.attributes.curHp,player.attributes.maxHp)
