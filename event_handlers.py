@@ -23,7 +23,7 @@ class MakeMeMan(EventHandler):
 
 class AmIMan(EventHandler):
     def isMatch(event : Event):
-        return event.isMentionType() and event.text.lower().find('am i a man?') > -1
+        return event.isMentionType() and event.text.lower().find('am i a man') > -1
     def handle(event : Event, repo: Repo, api : SlackApi):
         username = Presenter.username(event.sourceUser)
         current = repo.getPlayerForUser(event.sourceUser)
