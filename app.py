@@ -4,6 +4,11 @@ from slack_api import SlackApi
 from event_queue import EventQueue
 from event import Event
 
+import logging
+logging.basicConfig(filename='ozzytron.log',format='[%(asctime)s (%(process)d)] %(levelname)s: %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+logging.warning('booting')
+
+
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('ozzytron.cfg', silent=True)
 
